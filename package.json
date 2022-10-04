@@ -1,0 +1,31 @@
+{
+  "name": "cldn-ratelimit",
+  "version": "1.0.0",
+  "description": "Simple ratelimiter for Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "c8 mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudnode-pro/ratelimit.git"
+  },
+  "keywords": [
+    "rate",
+    "limit",
+    "ratelimit",
+    "ratelimiter",
+    "limiter",
+    "limit"
+  ],
+  "author": "Cloudnode",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/cloudnode-pro/ratelimit/issues"
+  },
+  "homepage": "https://github.com/cloudnode-pro/ratelimit#readme",
+  "devDependencies": {
+    "c8": "^7.12.0",
+    "mocha": "^10.0.0"
+  }
+}
