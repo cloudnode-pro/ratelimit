@@ -26,9 +26,9 @@ export class RateLimit {
 
     /**
      * Name of the rate limit
-     * @private
+     * @readonly
      */
-    #name: string;
+    readonly name: string;
     /**
      * The number of requests allowed per time window
      */
@@ -47,18 +47,10 @@ export class RateLimit {
      */
     constructor(name: string, limit: number, timeWindow: number) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
-        this.#name = name;
+        this.name = name;
         this.limit = limit;
         this.timeWindow = timeWindow;
         RateLimit.#instances.set(name, this);
-    }
-
-    /**
-     * Get rate limit name
-     * @readonly
-     */
-    get name(): string {
-        return this.#name;
     }
 
     /**
