@@ -57,6 +57,12 @@ If you want to reset the rate limit after a successful login, call `rateLimit.re
 	- [`rateLimit.reset(source)`](#ratelimitresetsource)
 	- [`rateLimit.setRemaining(source, remaining)`](#ratelimitsetremainingsource-remaining)
 	- [`rateLimit.timeWindow`](#ratelimittimewindow)
+- [Interface: `AttemptResult`](#interface-attemptresult)
+    - [`attemptResult.limit`](#attemptresultlimit)
+    - [`attemptResult.remaining`](#attemptresultremaining)
+    - [`attemptResult.reset`](#attemptresultreset)
+    - [`attemptResult.rateLimit`](#attemptresultratelimit)
+    - [`attemptResult.allow`](#attemptresultallow)
 </details>
 
 <a name="class-ratelimit"></a>
@@ -206,3 +212,37 @@ Set the remaining attempts for a source ID.
 The time window in seconds (e.g. 60)
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+
+<a name="interface-attemptresult"></a>
+## Interface: `AttemptResult`
+The result from a rate limit attempt
+
+<a name="attemptresultlimit"></a>
+### `attemptResult.limit`
+The number of requests this rate limit allows per time window
+
+- Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+
+<a name="attemptresultremaining"></a>
+### `attemptResult.remaining`
+The number of requests remaining in the current time window
+
+- Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+
+<a name="attemptresultreset"></a>
+### `attemptResult.reset`
+The number of seconds until the current time window resets
+
+- Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+
+<a name="attemptresultratelimit"></a>
+### `attemptResult.rateLimit`
+The rate limit that this attempt was made on
+
+- Type: [`RateLimit`](#class-ratelimit)
+
+<a name="attemptresultallow"></a>
+### `attemptResult.allow`
+Whether this attempt should be allowed to proceed. If false, the attempt is rate limited.
+
+- Type: [`boolean`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type)
