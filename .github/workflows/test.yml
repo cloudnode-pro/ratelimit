@@ -1,13 +1,13 @@
 name: Unit tests
 'on':
+  push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
     types:
       - opened
       - synchronize
       - reopened
-  schedule:
-    - cron: '0 6 * * 0'
-
 jobs:
   test:
     name: 'Node.js v${{ matrix.node }}'
