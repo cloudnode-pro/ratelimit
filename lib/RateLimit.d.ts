@@ -6,6 +6,11 @@ import { AttemptResult } from "./AttemptResult";
 export declare class RateLimit {
     #private;
     /**
+     * Name of the rate limit
+     * @readonly
+     */
+    readonly name: string;
+    /**
      * The number of requests allowed per time window
      */
     limit: number;
