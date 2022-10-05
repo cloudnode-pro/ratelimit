@@ -54,6 +54,14 @@ export class RateLimit {
     }
 
     /**
+     * Get rate limit name
+     * @readonly
+     */
+    get name(): string {
+        return this.#name;
+    }
+
+    /**
      * Check the attempt state for a source ID without decrementing the remaining attempts
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      */
