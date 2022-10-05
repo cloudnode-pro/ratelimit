@@ -1,12 +1,7 @@
 name: Unit tests
 'on':
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
-      - review_requested
+    types: [ opened, synchronize, reopened ]
 jobs:
   test:
     name: 'Node.js v${{ matrix.node }}'
