@@ -39,7 +39,7 @@ const testsResult = await new Promise((resolve, reject) => {
         const output = data.join("");
         const coverage = (output.match(/----(?:\n|.)+/g) ?? []).pop() ?? "";
         const percentages = coverage.match(/All files\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?/) ?? [];
-        const averageCoverage = percentages.map(p => parseInt(p)).reduce((a, b) => a + b, 0) / (percentages.length - 1);
+        const averageCoverage = percentages.slice(1).reduce((a, b) => a + parseInt(b, 10), 0) / 4;
         resolve({coverage: averageCoverage, testsPass: code === 0});
     });
 });
@@ -65,7 +65,7 @@ const buildPass = await new Promise((resolve, reject) => {
 const variables = {
     "shield:version": `![version: ${version}](https://img.shields.io/badge/version-${version}-%233b82f6)`,
     "shield:tests": `![test: ${testsResult.testsPass ? "passing" : "failing"}](https://img.shields.io/badge/tests-${testsResult.testsPass ? "passing" : "failing"}-${testsResult.testsPass ? "%2316a34a" : "%23ef4444"})`,
-    "shield:coverage": `![coverage: ${testsResult.coverage}%](https://img.shields.io/badge/coverage-${testsResult.coverage}%25-%23${coverageColors[Math.floor(testsResult.coverage / 100 * coverageColors.length)]})`,
+    "shield:coverage": `![coverage: ${testsResult.coverage}%](https://img.shields.io/badge/coverage-${testsResult.coverage}%25-%23${coverageColors.reverse()[Math.floor(testsResult.coverage * (coverageColors.length - 1) / 100)]})`,
     "shield:build": `![build: ${buildPass ? "passing" : "failing"}](https://img.shields.io/badge/build-${buildPass ? "passing" : "failing"}-${buildPass ? "%2316a34a" : "%23ef4444"})`,
 }
 
