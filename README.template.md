@@ -32,7 +32,7 @@ attemptLogin("john.doe", "password123"); //-> "rate-limited"
 attemptLogin("john.doe", "password123"); //-> "success"
 ```
 
-If you want to reset the rate limit after a successful login, call [`rateLimit.reset(username)`](#ratelimitresetsource)].
+If you want to reset the rate limit after a successful login, call [`rateLimit.reset(username)`](#ratelimitresetsource).
 
 # Documentation
 <details open>
