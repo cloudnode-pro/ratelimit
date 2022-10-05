@@ -2,9 +2,13 @@
   "name": "cldn-ratelimit",
   "version": "1.0.0",
   "description": "Simple ratelimiter for Node.js",
-  "main": "index.js",
+  "main": "lib/RateLimit.js",
+  "type": "module",
   "scripts": {
-    "test": "c8 mocha"
+    "_test": "mocha",
+    "test": "c8 npm run _test",
+    "coverage": "c8 --reporter=html npm run _test",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
