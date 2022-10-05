@@ -83,3 +83,6 @@ const output: string = Object.entries(variables).reduce((output: string, [variab
  * Write output file
  */
 await fs.writeFile(OUTPUT_FILE, output);
+
+console.log(`Generated ${OUTPUT_FILE}`);
+console.log("Variables", variables);
