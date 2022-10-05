@@ -222,27 +222,32 @@ The result from a rate limit attempt
 The number of requests this rate limit allows per time window
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+- Readonly
 
 <a name="attemptresultremaining"></a>
 ### `attemptResult.remaining`
 The number of requests remaining in the current time window
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+- Readonly
 
 <a name="attemptresultreset"></a>
 ### `attemptResult.reset`
 The number of seconds until the current time window resets
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
+- Readonly
 
 <a name="attemptresultratelimit"></a>
 ### `attemptResult.rateLimit`
 The rate limit that this attempt was made on
 
 - Type: [`RateLimit`](#class-ratelimit)
+- Readonly
 
 <a name="attemptresultallow"></a>
 ### `attemptResult.allow`
 Whether this attempt should be allowed to proceed. If false, the attempt is rate limited.
 
 - Type: [`boolean`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type)
+- Readonly
