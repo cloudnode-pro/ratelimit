@@ -58,7 +58,7 @@ export class RateLimit {
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      */
     check(source: string): AttemptResult {
-        if (this.#deleted) throw new Error(`Rate limit "${this.#name}" has been deleted. Construct a new instance`);
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const attempts = this.#attempts.get(source) ?? [0, Date.now()];
         const remaining = this.limit - attempts[0];
         const reset = Math.ceil((attempts[1] + (this.timeWindow * 1000) - Date.now()) / 1000);
@@ -77,7 +77,7 @@ export class RateLimit {
      * @param {number} [attempts=1] - The number of attempts to make
      */
     attempt(source: string, attempts: number = 1): AttemptResult {
-        if (this.#deleted) throw new Error(`Rate limit "${this.#name}" has been deleted. Construct a new instance`);
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const data = this.#attempts.get(source) ?? [0, Date.now()];
         // if the time window has expired, reset the attempts
         if (data[1] + (this.timeWindow * 1000) < Date.now()) {
@@ -95,7 +95,7 @@ export class RateLimit {
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      */
     reset(source: string): void {
-        if (this.#deleted) throw new Error(`Rate limit "${this.#name}" has been deleted. Construct a new instance`);
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         this.#attempts.delete(source);
     }
 
@@ -106,7 +106,7 @@ export class RateLimit {
      * @param {number} remaining - The number of remaining attempts
      */
     setRemaining(source: string, remaining: number): void {
-        if (this.#deleted) throw new Error(`Rate limit "${this.#name}" has been deleted. Construct a new instance`);
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const data = this.#attempts.get(source) ?? [0, Date.now()];
         data[0] = this.limit - remaining;
         this.#attempts.set(source, data);
@@ -116,7 +116,7 @@ export class RateLimit {
      * Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
      */
     clear(): void {
-        if (this.#deleted) throw new Error(`Rate limit "${this.#name}" has been deleted. Construct a new instance`);
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         this.#attempts.clear();
     }
 
@@ -126,7 +126,7 @@ export class RateLimit {
     delete(): void {
         this.clear();
         this.#deleted = true;
-        RateLimit.#instances.delete(this.#name);
+        RateLimit.#instances.delete(this.name);
     }
 
     /**
