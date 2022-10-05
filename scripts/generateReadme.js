@@ -6,14 +6,14 @@
 import fs from "node:fs/promises";
 import * as child_process from "child_process";
 
-const TEMPLATE_FILE: string = "README.template.md";
-const OUTPUT_FILE: string = "README.md";
+const TEMPLATE_FILE = "README.template.md";
+const OUTPUT_FILE = "README.md";
 
 /**
  * Determine version from package.json
  */
-const packageJson: any = JSON.parse(await fs.readFile("package.json", "utf8"));
-const version: string = packageJson.version;
+const packageJson = JSON.parse(await fs.readFile("package.json", "utf8"));
+const version = packageJson.version;
 
 /**
  * Run test and get coverage
@@ -30,16 +30,16 @@ const version: string = packageJson.version;
  *
  * The coverage percentage is the average of all columns for "All files".
  */
-const testsResult: {coverage: number, testsPass: boolean} = await new Promise((resolve, reject) => {
+const testsResult = await new Promise((resolve, reject) => {
     const child = child_process.spawn("npm", ["test"]);
-    const data: string[] = [];
-    child.stdout.on("data", (chunk: string) => data.push(chunk));
-    child.on("exit", (code: number) => {
+    const data = [];
+    child.stdout.on("data", (chunk) => data.push(chunk));
+    child.on("exit", (code) => {
         // Get coverage percentage
-        const output: string = data.join("");
-        const coverage: string = (output.match(/----(?:\n|.)+/g) ?? []).pop() ?? "";
+        const output = data.join("");
+        const coverage = (output.match(/----(?:\n|.)+/g) ?? []).pop() ?? "";
         const percentages = coverage.match(/All files\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?/) ?? [];
-        const averageCoverage: number = percentages.map((p: string) => parseInt(p)).reduce((a: number, b: number) => a + b, 0) / (percentages.length - 1);
+        const averageCoverage = percentages.map(p => parseInt(p)).reduce((a, b) => a + b, 0) / (percentages.length - 1);
         resolve({coverage: averageCoverage, testsPass: code === 0});
     });
 });
@@ -47,14 +47,14 @@ const testsResult: {coverage: number, testsPass: boolean} = await new Promise((r
 /**
  * Coverage colors
  */
-const coverageColors: string[] = ["16a34a", "84cc16", "eab308", "f59e0b", "f97316", "ef4444"];
+const coverageColors = ["16a34a", "84cc16", "eab308", "f59e0b", "f97316", "ef4444"];
 
 /**
  * Determine if the build passes by the exit code of `npm run build`
  */
-const buildPass: boolean = await new Promise((resolve, reject) => {
+const buildPass = await new Promise((resolve, reject) => {
     const child = child_process.spawn("npm", ["run", "build"]);
-    child.on("exit", (code: number) => resolve(code === 0));
+    child.on("exit", (code) => resolve(code === 0));
 });
 
 /**
@@ -62,7 +62,7 @@ const buildPass: boolean = await new Promise((resolve, reject) => {
  *
  * {{variable_name}}
  */
-const variables: Record<string, string> = {
+const variables = {
     "shield:version": `![version: ${version}](https://img.shields.io/badge/version-${version}-%233b82f6)`,
     "shield:tests": `![test: ${testsResult.testsPass ? "passing" : "failing"}](https://img.shields.io/badge/tests-${testsResult.testsPass ? "passing" : "failing"}-${testsResult.testsPass ? "%2316a34a" : "%23ef4444"})`,
     "shield:coverage": `![coverage: ${testsResult.coverage}%](https://img.shields.io/badge/coverage-${testsResult.coverage}%25-%23${coverageColors[Math.floor(testsResult.coverage / 100 * coverageColors.length)]})`,
@@ -72,12 +72,12 @@ const variables: Record<string, string> = {
 /**
  * Read template file
  */
-const template: string = await fs.readFile(TEMPLATE_FILE, "utf8");
+const template = await fs.readFile(TEMPLATE_FILE, "utf8");
 
 /**
  * Replace variables in template
  */
-const output: string = Object.entries(variables).reduce((output: string, [variable, value]: [string, string]) => output.replace(new RegExp(`{{${variable}}}`, "g"), value), template);
+const output = Object.entries(variables).reduce((output, [variable, value]) => output.replace(new RegExp(`{{${variable}}}`, "g"), value), template);
 
 /**
  * Write output file
