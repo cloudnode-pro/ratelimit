@@ -25,6 +25,22 @@ export class RateLimit {
     #attempts = new Map<string, [number, number]>();
 
     /**
+     * Global rate limit settings. These will apply to all rate limits.
+     * @type {RateLimitSettings}
+     * @static
+     */
+    static settings: RateLimitSettings = {
+        sendHeaders: true,
+        headers: {
+            limit: "RateLimit-Limit",
+            remaining: "RateLimit-Remaining",
+            reset: "RateLimit-Reset",
+            policy: "RateLimit-Policy"
+        },
+        resetHeaderValue: (reset: number) => reset.toString(),
+    };
+
+    /**
      * Name of the rate limit
      * @readonly
      */
