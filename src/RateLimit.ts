@@ -1,4 +1,6 @@
 import {AttemptResult} from "./AttemptResult";
+import {RateLimitSettings} from "./RateLimitSettings";
+import e from "express";
 
 /**
  * Rate limit
@@ -38,9 +40,18 @@ export class RateLimit {
             limit: "RateLimit-Limit",
             remaining: "RateLimit-Remaining",
             reset: "RateLimit-Reset",
-            policy: "RateLimit-Policy"
+            //policy: "RateLimit-Policy"
+            policy: null
         },
         resetHeaderValue: (reset: number) => reset.toString(),
+        defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next: e.NextFunction) => {
+            process.emitWarning("You are using the default rate limit response", {
+                code: "RATELIMIT_DEFAULT_RESPONSE",
+                detail: "This is not recommended. Please set a custom response by modifying the rate limit settings (`RateLimit.settings.defaultResponse` or `RateLimit.settings.defaultResponse`). Check the documentation for more information."
+            });
+            res.set("Retry-After", attempt.reset.toString());
+            res.status(429).send("Too Many Requests");
+        }
     };
 
     /**

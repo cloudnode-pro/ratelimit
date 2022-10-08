@@ -1,8 +1,11 @@
+import {AttemptResult} from "./AttemptResult";
+import e from "express";
+
 /**
  * Rate limit settings
  * @interface RateLimitSettings
  */
-interface RateLimitSettings {
+export interface RateLimitSettings {
     /**
      * Automatically send rate limit headers when using `.request()` and `.middleware()`. Individual headers can be disabled by setting them to `null` in the `headers` object.
      * @type {boolean}
@@ -51,4 +54,14 @@ interface RateLimitSettings {
      * @default (reset) => reset.toString()
      */
     resetHeaderValue: (reset: number) => string;
+
+    /**
+     * A function to send a "429 Too Many Requests" response. This is used when {@link RateLimit.middleware} is used or if {@link RateLimit.sendDefaultResponse} is manually invoked.
+     * @param {AttemptResult} attempt - The rate limit attempt result
+     * @param {e.Request} req - The express request object
+     * @param {e.Response} res - The express response object
+     * @param {e.NextFunction} next - The express next() function
+     * @returns {void}
+     */
+    defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next: e.NextFunction) => void;
 }
