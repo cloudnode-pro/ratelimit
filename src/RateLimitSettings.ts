@@ -63,5 +63,5 @@ export interface RateLimitSettings {
      * @param {e.NextFunction} next - The express next() function
      * @returns {void}
      */
-    defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next: e.NextFunction) => void;
+    defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction) => void;
 }

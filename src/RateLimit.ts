@@ -44,7 +44,7 @@ export class RateLimit {
             policy: null
         },
         resetHeaderValue: (reset: number) => reset.toString(),
-        defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next: e.NextFunction) => {
+        defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction) => {
             process.emitWarning("You are using the default rate limit response", {
                 code: "RATELIMIT_DEFAULT_RESPONSE",
                 detail: "This is not recommended. Please set a custom response by modifying the rate limit settings (`RateLimit.settings.defaultResponse` or `RateLimit.settings.defaultResponse`). Check the documentation for more information."
@@ -169,6 +169,16 @@ export class RateLimit {
     }
 
     /**
+     * Send rate limit response that is set in the settings.
+     * @param {AttemptResult} attempt - The attempt result
+     * @param {e.Request} req - An Express request object
+     * @param {e.Response} res - An Express response object
+     * @param {function(): void} [next] - Call next middleware
+     * @returns {void}
+     */
+    response(attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction): void {
+        this.settings.defaultResponse(attempt, req, res, next);
+    }
      * Set the remaining attempts for a source ID.
      * > **Warning**: This is not recommended as the remaining attempts depend on the limit of the instance.
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
