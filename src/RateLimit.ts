@@ -129,6 +129,24 @@ export class RateLimit {
     }
 
     /**
+     * Make a rate limit attempt and also send rate limit headers.
+     * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @param {Request} req - An Express request object
+     * @param {Response} res - An Express response object
+     * @returns {AttemptResult}
+     */
+    attemptAndSendHeaders(source: string, req: Request, res: Response): AttemptResult {
+        const result = this.attempt(source);
+        if (this.settings.sendHeaders) {
+            if (this.settings.headers.limit !== null) res.setHeader(this.settings.headers.limit, this.limit.toString());
+            if (this.settings.headers.remaining !== null) res.setHeader(this.settings.headers.remaining, result.remaining.toString());
+            if (this.settings.headers.reset !== null) res.setHeader(this.settings.headers.reset, this.settings.resetHeaderValue(result.reset));
+            if (this.settings.headers.policy !== null) res.setHeader(this.settings.headers.policy, this.name);
+        }
+        return result;
+    }
+
+    /**
      * Set the remaining attempts for a source ID.
      * > **Warning**: This is not recommended as the remaining attempts depend on the limit of the instance.
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
