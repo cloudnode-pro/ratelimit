@@ -179,6 +179,25 @@ export class RateLimit {
     response(attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction): void {
         this.settings.defaultResponse(attempt, req, res, next);
     }
+
+    /**
+     * Express.js middleware to make a rate limit attempt and also send rate limit headers.
+     * @param {function(e.Request): string} source - A function that is called with the Express request object and returns a unique source identifier (e.g. username, IP, etc.)
+     * @returns {e.RequestHandler}
+     */
+    middleware(source: (req: e.Request) => string): e.RequestHandler {
+        return (req, res, next) => {
+            const result = this.request(source(req), req, res);
+            if (!result.allow) this.response(result, req, res, next);
+            else if (next) next();
+            else {
+                process.emitWarning("No next function provided to rate limit middleware");
+                res.end();
+            }
+        };
+    }
+
+    /**
      * Set the remaining attempts for a source ID.
      * > **Warning**: This is not recommended as the remaining attempts depend on the limit of the instance.
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
