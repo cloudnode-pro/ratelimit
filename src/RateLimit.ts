@@ -43,29 +43,42 @@ export class RateLimit {
     /**
      * Name of the rate limit
      * @readonly
+     * @type {string}
      */
     readonly name: string;
+
     /**
      * The number of requests allowed per time window
+     * @type {number}
      */
     limit: number;
+
     /**
      * The time window in seconds (e.g. 60)
+     * @type {number}
      */
     timeWindow: number;
+
+    /**
+     * Settings for this rate limit
+     * @type {RateLimitSettings}
+     */
+    settings: RateLimitSettings = RateLimit.settings;
 
     /**
      * Create a new rate limit
      * @param {string} name - The name of the rate limit
      * @param {number} limit - The number of requests allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
+     * @param {RateLimitSettings|Record<string, any>} [settings] - Settings for this rate limit
      * @throws {Error} - If the rate limit already exists
      */
-    constructor(name: string, limit: number, timeWindow: number) {
+    constructor(name: string, limit: number, timeWindow: number, settings?: RateLimitSettings | Record<string, any>) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
         this.name = name;
         this.limit = limit;
         this.timeWindow = timeWindow;
+        if (settings) Object.assign(this.settings, settings);
         RateLimit.#instances.set(name, this);
     }
 
