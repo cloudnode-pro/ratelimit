@@ -47,7 +47,7 @@ const testsResult = await new Promise((resolve, reject) => {
 /**
  * Coverage colors
  */
-const coverageColors = ["16a34a", "84cc16", "eab308", "f59e0b", "f97316", "ef4444"];
+const coverageColors = ["16a34a", "ca8a04", "f97316", "ef4444", "b91c1c"];
 
 /**
  * Determine if the build passes by the exit code of `npm run build`
