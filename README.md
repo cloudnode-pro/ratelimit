@@ -1,7 +1,7 @@
 # Rate limiting utility
 ![version: 1.1.0](https://img.shields.io/badge/version-1.1.0-%233b82f6)
 ![test: passing](https://img.shields.io/badge/tests-passing-%2316a34a)
-![coverage: 100%](https://img.shields.io/badge/coverage-100%25-%2316a34a)
+![coverage: 84%](https://img.shields.io/badge/coverage-84%25-%23ca8a04)
 ![build: passing](https://img.shields.io/badge/build-passing-%2316a34a)
 
 A relatively simple utility for abstract rate limiting. This library uses memory storage (i.e. does not rely on external database or writing data on your file system). Rate limits are reset if the process is restarted.
