@@ -42,7 +42,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
 	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callback)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
-	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
+	- [Static method: `RateLimit.create(name, limit, timeWindow, [settings])`](#static-method-ratelimitcreatename-limit-timewindow-settings)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
 	- [Static method: `RateLimit.get(name)`](#static-method-ratelimitgetname)
     - [Static method: `RateLimit.middleware(name, source)`](#static-method-ratelimitmiddlewarename-source)
@@ -50,7 +50,8 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [Static method: `RateLimit.reset(name, source)`](#static-method-ratelimitresetname-source)
     - [Static method: `RateLimit.response(name, attempt, req, res, [next])`](#static-method-ratelimitresponsename-attempt-req-res-next)
 	- [Static method: `RateLimit.setRemaining(name, source, remaining)`](#static-method-ratelimitsetremainingname-source-remaining)
-	- [`new RateLimit(name, limit, timeWindow)`](#new-ratelimitname-limit-timewindow)
+    - [Static property: `RateLimit.settings`](#static-property-ratelimitsettings)
+	- [`new RateLimit(name, limit, timeWindow, [settings])`](#new-ratelimitname-limit-timewindow-settings)
 	- [`rateLimit.attempt(source, [attempts], [callback])`](#ratelimitattemptsource-attempts-callback)
 	- [`rateLimit.check(source, [callback])`](#ratelimitchecksource-callback)
 	- [`rateLimit.clear()`](#ratelimitclear)
@@ -62,6 +63,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [`rateLimit.reset(source)`](#ratelimitresetsource)
     - [`rateLimit.response(attempt, req, res, [next])`](#ratelimitresponseattempt-req-res-next)
 	- [`rateLimit.setRemaining(source, remaining)`](#ratelimitsetremainingsource-remaining)
+    - [`rateLimit.settings`](#ratelimitsettings)
 	- [`rateLimit.timeWindow`](#ratelimittimewindow)
 - [Interface: `AttemptResult`](#interface-attemptresult)
     - [`attemptResult.limit`](#attemptresultlimit)
@@ -83,10 +85,12 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 </details>
 
 <a name="class-ratelimit"></a>
+
 ## Class: `RateLimit`
 Rate limit
 
 <a name="static-method-ratelimitattemptname-source-attempts-callback"></a>
+
 ### Static method: `RateLimit.attempt(name, source, [attempts], [callback])`
 Make an attempt with a source ID
 
@@ -100,6 +104,7 @@ Make an attempt with a source ID
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
 <a name="static-method-ratelimitcheckname-source-callbac"></a>
+
 ### Static method: `RateLimit.check(name, source, [callback])`
 Check the attempt state for a source ID without decrementing the remaining attempts
 
@@ -112,6 +117,7 @@ Check the attempt state for a source ID without decrementing the remaining attem
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
 <a name="static-method-ratelimitclearname"></a>
+
 ### Static method: `RateLimit.clear(name)`
 Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
 
@@ -119,16 +125,19 @@ Clear rate limit attempts storage. This is equivalent to resetting all rate limi
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
-<a name="static-method-ratelimitcreatename-limit-timewindow"></a>
-### Static method: `RateLimit.create(name, limit, timeWindow)`
+<a name="static-method-ratelimitcreatename-limit-timewindow-settings"></a>
+
+### Static method: `RateLimit.create(name, limit, timeWindow, [settings])`
 Create a new rate limit
 
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
+- `settings` [`RateLimitSettings`](#interface-ratelimitsettings) Settings for this rate limit
 - Returns: [`RateLimit`](#class-ratelimit)
 
 <a name="static-method-ratelimitdeletename"></a>
+
 ### Static method: `RateLimit.delete(name)`
 Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
 
@@ -137,6 +146,7 @@ Delete the rate limit instance. After it is deleted, it should not be used any f
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
 <a name="static-method-ratelimitgetname"></a>
+
 ### Static method: `RateLimit.get(name)`
 Get a rate limit instance
 
@@ -144,6 +154,7 @@ Get a rate limit instance
 - Returns: [`RateLimit`](#class-ratelimit) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
 
 <a name="static-method-ratelimitmiddlewarename-source"></a>
+
 ### Static method: `RateLimit.middleware(name, source)`
 Express.js middleware to make a rate limit attempt and also send rate limit headers.
 
@@ -152,6 +163,7 @@ Express.js middleware to make a rate limit attempt and also send rate limit head
 - Returns: [`e.RequestHandler`](https://expressjs.com/en/guide/using-middleware.html)
 
 <a name="static-method-ratelimitrequestname-source-req-res"></a>
+
 ### Static method: `RateLimit.request(name, source, req, res)`
 Make a rate limit attempt and also send rate limit headers.
 
@@ -162,6 +174,7 @@ Make a rate limit attempt and also send rate limit headers.
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
 <a name="static-method-ratelimitresetsource"></a>
+
 ### Static method: `RateLimit.reset(name, source)`
 Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
 
@@ -171,6 +184,7 @@ Reset limit for a source ID. The storage entry will be deleted and a new one wil
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
 <a name="static-method-ratelimitresponsename-attempt-req-res-next"></a>
+
 ### Static method: `RateLimit.response(name, attempt, req, res, [next])`
 Send rate limit response that is set in the settings.
 
@@ -181,6 +195,7 @@ Send rate limit response that is set in the settings.
 - `next` [`e.NextFunction`](https://expressjs.com/en/guide/using-middleware.html) Call next middleware
 
 <a name="static-method-ratelimitsetremainingname-source-remaining"></a>
+
 ### Static method: `RateLimit.setRemaining(name, source, remaining)`
 Set the remaining attempts for a source ID.
 
@@ -192,16 +207,26 @@ Set the remaining attempts for a source ID.
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
-<a name="new-ratelimitname-limit-timewindow"></a>
-### `new RateLimit(name, limit, timeWindow)`
+<a name="static-property-ratelimitsettings"></a>
+
+### Static property: `RateLimit.settings`
+Global rate limit settings. These will apply to all rate limits.
+
+- Type: [`RateLimitSettings`](#interface-ratelimitsettings)
+
+<a name="new-ratelimitname-limit-timewindow-settings"></a>
+
+### `new RateLimit(name, limit, timeWindow, [settings])`
 Create a new rate limit
 
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
+- `settings` [`Settings`](#interface-ratelimitsettings) Settings for this rate limit
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit already exists
 
 <a name="ratelimitattemptsource-attempts-callback"></a>
+
 ### `rateLimit.attempt(source, [attempts], [callback])`
 Make an attempt with a source ID
 
@@ -213,6 +238,7 @@ Make an attempt with a source ID
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
 <a name="ratelimitchecksource-callback"></a>
+
 ### `rateLimit.check(source, [callback])`
 Check the attempt state for a source ID without decrementing the remaining attempts
 
@@ -223,24 +249,28 @@ Check the attempt state for a source ID without decrementing the remaining attem
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
 <a name="ratelimitclear"></a>
+
 ### `rateLimit.clear()`
 Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
 
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
 <a name="ratelimitdelete"></a>
+
 ### `rateLimit.delete()`
 Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
 
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
 <a name="ratelimitlimit"></a>
+
 ### `rateLimit.limit`
 The number of requests allowed per time window
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
 
 <a name="ratelimitmiddleware-source"></a>
+
 ### `rateLimit.middleware(source)`
 Express.js middleware to make a rate limit attempt and also send rate limit headers.
 
@@ -248,6 +278,7 @@ Express.js middleware to make a rate limit attempt and also send rate limit head
 - Returns: [`e.RequestHandler`](https://expressjs.com/en/guide/using-middleware.html) Express.js middleware
 
 <a name="ratelimitname"></a>
+
 ### `rateLimit.name`
 Get rate limit name
 
@@ -255,6 +286,7 @@ Get rate limit name
 - Readonly
 
 <a name="ratelimitrequestsource-req-res"></a>
+
 ### `rateLimit.request(source, req, res)`
 Make a rate limit attempt and also send rate limit headers.
 
@@ -264,6 +296,7 @@ Make a rate limit attempt and also send rate limit headers.
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
 <a name="ratelimitresetsource"></a>
+
 ### `rateLimit.reset(source)`
 Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
 
@@ -271,6 +304,7 @@ Reset limit for a source ID. The storage entry will be deleted and a new one wil
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
 <a name="ratelimitresponseattempt-req-res-next"></a>
+
 ### `rateLimit.response(attempt, req, res, [next])`
 Send rate limit response that is set in the settings.
 
@@ -281,6 +315,7 @@ Send rate limit response that is set in the settings.
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
 <a name="ratelimitsetremainingsource-remaining"></a>
+
 ### `rateLimit.setRemaining(source, remaining)`
 Set the remaining attempts for a source ID.
 
@@ -290,7 +325,15 @@ Set the remaining attempts for a source ID.
 - `remaining` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of remaining attempts
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
+<a name="ratelimitsettings"></a>
+
+### `rateLimit.settings`
+Settings for this rate limit
+
+- Type: [`RateLimitSettings`](#interface-ratelimitsettings)
+
 <a name="ratelimittimewindow"></a>
+
 ### `rateLimit.timeWindow`
 The time window in seconds (e.g. 60)
 
@@ -302,6 +345,7 @@ The time window in seconds (e.g. 60)
 The result from a rate limit attempt
 
 <a name="attemptresultlimit"></a>
+
 ### `attemptResult.limit`
 The number of requests this rate limit allows per time window
 
@@ -309,6 +353,7 @@ The number of requests this rate limit allows per time window
 - Readonly
 
 <a name="attemptresultremaining"></a>
+
 ### `attemptResult.remaining`
 The number of requests remaining in the current time window
 
@@ -316,6 +361,7 @@ The number of requests remaining in the current time window
 - Readonly
 
 <a name="attemptresultreset"></a>
+
 ### `attemptResult.reset`
 The number of seconds until the current time window resets
 
@@ -323,6 +369,7 @@ The number of seconds until the current time window resets
 - Readonly
 
 <a name="attemptresultratelimit"></a>
+
 ### `attemptResult.rateLimit`
 The rate limit that this attempt was made on
 
@@ -330,6 +377,7 @@ The rate limit that this attempt was made on
 - Readonly
 
 <a name="attemptresultallow"></a>
+
 ### `attemptResult.allow`
 Whether this attempt should be allowed to proceed. If false, the attempt is rate limited.
 
@@ -340,6 +388,7 @@ Whether this attempt should be allowed to proceed. If false, the attempt is rate
 Rate limit settings
 
 <a name="ratelimitsettingssendheaders"></a>
+
 ### `rateLimitSettings.sendHeaders`
 Automatically send rate limit headers when using `.request()` and `.middleware()`. Individual headers can be disabled by setting them to `null` in the `headers` object.
 
@@ -347,12 +396,14 @@ Automatically send rate limit headers when using `.request()` and `.middleware()
 - Default: `true`
 
 <a name="ratelimitsettingsheaders"></a>
+
 ### `rateLimitSettings.headers`
 Name of the headers to send. Set a specific header to `null` to disable it. This has no effect if `sendHeaders` is `false`.
 
 - Type: [`Record<string, string | null>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)
 
 <a name="ratelimitsettingsheaderslimit"></a>
+
 #### `rateLimitSettings.headers.limit`
 Indicates the service limit associated to the client in the current time-window.
 
@@ -360,6 +411,7 @@ Indicates the service limit associated to the client in the current time-window.
 - Default: `'RateLimit-Limit'`
 
 <a name="ratelimitsettingsheadersremaining"></a>
+
 #### `rateLimitSettings.headers.remaining`
 Indicates the remaining quota units (attempts).
 
@@ -367,6 +419,7 @@ Indicates the remaining quota units (attempts).
 - Default: `'RateLimit-Remaining'`
 
 <a name="ratelimitsettingsheadersreset"></a>
+
 #### `rateLimitSettings.headers.reset`
 Indicates the number of seconds until the quota resets.
 
@@ -374,6 +427,7 @@ Indicates the number of seconds until the quota resets.
 - Default: `'RateLimit-Reset'`
 
 <a name="ratelimitsettingsheaderspolicy"></a>
+
 #### `rateLimitSettings.headers.policy`
 Indicates the quota associated to the client and its value is informative. See [IETF RateLimit Fields for HTTP, Section 2.3](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers#section-2.3)
 
@@ -385,6 +439,7 @@ Indicates the quota associated to the client and its value is informative. See [
 ## Namespace: `RateLimit`
 
 <a name="type-ratelimitsourcefromreq"></a>
+
 ### Type: `RateLimit.SourceFromReq`
 A function that is called with the Express request object and returns a source ID
 
