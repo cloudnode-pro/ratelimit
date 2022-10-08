@@ -69,6 +69,15 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
     - [`attemptResult.reset`](#attemptresultreset)
     - [`attemptResult.rateLimit`](#attemptresultratelimit)
     - [`attemptResult.allow`](#attemptresultallow)
+- [Interface: `RateLimitSettings`](#interface-ratelimitsettings)
+    - [`rateLimitSettings.sendHeaders`](#ratelimitsettingssendheaders)
+    - [`rateLimitSettings.headers`](#ratelimitsettingsheaders)
+      - [`rateLimitSettings.headers.limit`](#ratelimitsettingsheaderslimit)
+      - [`rateLimitSettings.headers.remaining`](#ratelimitsettingsheadersremaining)
+      - [`rateLimitSettings.headers.reset`](#ratelimitsettingsheadersreset)
+      - [`rateLimitSettings.headers.policy`](#ratelimitsettingsheaderspolicy)
+    - [`rateLimitSettings.resetHeaderValue(reset)`](#ratelimitsettingsresetheadervaluereset)
+    - [`rateLimitSettings.defaultResponse(attempt, req, res, [next])`](#ratelimitsettingsdefaultresponseattempt-req-res-next)
 - [Namespace: `RateLimit`](#namespace-ratelimit)
   - [Type: `RateLimit.SourceFromReq`](#type-ratelimitsourcefromreq) 
 </details>
@@ -288,6 +297,7 @@ The time window in seconds (e.g. 60)
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
 
 <a name="interface-attemptresult"></a>
+
 ## Interface: `AttemptResult`
 The result from a rate limit attempt
 
@@ -326,10 +336,56 @@ Whether this attempt should be allowed to proceed. If false, the attempt is rate
 - Type: [`boolean`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type)
 - Readonly
 
+## Interface: `RateLimitSettings`
+Rate limit settings
+
+<a name="ratelimitsettingssendheaders"></a>
+### `rateLimitSettings.sendHeaders`
+Automatically send rate limit headers when using `.request()` and `.middleware()`. Individual headers can be disabled by setting them to `null` in the `headers` object.
+
+- Type: [`boolean`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type)
+- Default: `true`
+
+<a name="ratelimitsettingsheaders"></a>
+### `rateLimitSettings.headers`
+Name of the headers to send. Set a specific header to `null` to disable it. This has no effect if `sendHeaders` is `false`.
+
+- Type: [`Record<string, string | null>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)
+
+<a name="ratelimitsettingsheaderslimit"></a>
+#### `rateLimitSettings.headers.limit`
+Indicates the service limit associated to the client in the current time-window.
+
+- Type: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
+- Default: `'RateLimit-Limit'`
+
+<a name="ratelimitsettingsheadersremaining"></a>
+#### `rateLimitSettings.headers.remaining`
+Indicates the remaining quota units (attempts).
+
+- Type: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
+- Default: `'RateLimit-Remaining'`
+
+<a name="ratelimitsettingsheadersreset"></a>
+#### `rateLimitSettings.headers.reset`
+Indicates the number of seconds until the quota resets.
+
+- Type: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
+- Default: `'RateLimit-Reset'`
+
+<a name="ratelimitsettingsheaderspolicy"></a>
+#### `rateLimitSettings.headers.policy`
+Indicates the quota associated to the client and its value is informative. See [IETF RateLimit Fields for HTTP, Section 2.3](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers#section-2.3)
+
+> **Note**: This feature is experimental. Policy reporting is not implemented yet. This is reserved for future use.
+
+- Type: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
+- Default: `'RateLimit-Policy'`
+
 ## Namespace: `RateLimit`
 
 <a name="type-ratelimitsourcefromreq"></a>
-## Type: `RateLimit.SourceFromReq`
+### Type: `RateLimit.SourceFromReq`
 A function that is called with the Express request object and returns a source ID
 
 - Type: [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)
