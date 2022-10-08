@@ -133,7 +133,7 @@ Create a new rate limit
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
-- `settings` [`RateLimitSettings`](#interface-ratelimitsettings) Settings for this rate limit
+- `settings` [`RateLimitSettings`](#interface-ratelimitsettings) or [`Record<string, any>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) Settings for this rate limit
 - Returns: [`RateLimit`](#class-ratelimit)
 
 <a name="static-method-ratelimitdeletename"></a>
@@ -222,7 +222,7 @@ Create a new rate limit
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
-- `settings` [`Settings`](#interface-ratelimitsettings) Settings for this rate limit
+- `settings` [`RateLimitSettings`](#interface-ratelimitsettings) or [`Record<string, any>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) Settings for this rate limit
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit already exists
 
 <a name="ratelimitattemptsource-attempts-callback"></a>
