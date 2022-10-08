@@ -40,7 +40,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 
 - [Class: `RateLimit`](#class-ratelimit)
 	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
-	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callbac)
+	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callback)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
 	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
@@ -48,7 +48,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
     - [Static method: `RateLimit.middleware(name, source)`](#static-method-ratelimitmiddlewarename-source)
 	- [Static method: `RateLimit.request(name, source, req, res)`](#static-method-ratelimitrequestname-source-req-res)
 	- [Static method: `RateLimit.reset(name, source)`](#static-method-ratelimitresetname-source)
-    - [Static method: `RateLimit.response(name, attempt, req, res, next)`](#static-method-ratelimitresponsename-attempt-req-res-next)
+    - [Static method: `RateLimit.response(name, attempt, req, res, [next])`](#static-method-ratelimitresponsename-attempt-req-res-next)
 	- [Static method: `RateLimit.setRemaining(name, source, remaining)`](#static-method-ratelimitsetremainingname-source-remaining)
 	- [`new RateLimit(name, limit, timeWindow)`](#new-ratelimitname-limit-timewindow)
 	- [`rateLimit.attempt(source, [attempts], [callback])`](#ratelimitattemptsource-attempts-callback)
@@ -60,7 +60,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [`rateLimit.name`](#ratelimitname)
     - [`rateLimit.request(source, req, res)`](#ratelimitrequestsource-req-res)
 	- [`rateLimit.reset(source)`](#ratelimitresetsource)
-    - [`rateLimit.response(attempt, req, res, next)`](#ratelimitresponseattempt-req-res-next)
+    - [`rateLimit.response(attempt, req, res, [next])`](#ratelimitresponseattempt-req-res-next)
 	- [`rateLimit.setRemaining(source, remaining)`](#ratelimitsetremainingsource-remaining)
 	- [`rateLimit.timeWindow`](#ratelimittimewindow)
 - [Interface: `AttemptResult`](#interface-attemptresult)
@@ -70,7 +70,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
     - [`attemptResult.rateLimit`](#attemptresultratelimit)
     - [`attemptResult.allow`](#attemptresultallow)
 - [Namespace: `RateLimit`](#namespace-ratelimit)
-  - [Type: `SourceFromReq`](#type-sourcefromreq) 
+  - [Type: `RateLimit.SourceFromReq`](#type-ratelimitsourcefromreq) 
 </details>
 
 <a name="class-ratelimit"></a>
@@ -134,6 +134,24 @@ Get a rate limit instance
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - Returns: [`RateLimit`](#class-ratelimit) or [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type)
 
+<a name="static-method-ratelimitmiddlewarename-source"></a>
+### Static method: `RateLimit.middleware(name, source)`
+Express.js middleware to make a rate limit attempt and also send rate limit headers.
+
+- `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
+- `source` [`RateLimit.SourceFromReq`](#type-ratelimitsourcefromreq) Function to get the source ID from the request
+- Returns: [`e.RequestHandler`](https://expressjs.com/en/guide/using-middleware.html)
+
+<a name="static-method-ratelimitrequestname-source-req-res"></a>
+### Static method: `RateLimit.request(name, source, req, res)`
+Make a rate limit attempt and also send rate limit headers.
+
+- `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
+- `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
+- `req` [`e.Request`](https://expressjs.com/en/api.html#req) Express.js request object
+- `res` [`e.Response`](https://expressjs.com/en/api.html#res) Express.js response object
+- Returns: [`AttemptResult`](#interface-attemptresult)
+
 <a name="static-method-ratelimitresetsource"></a>
 ### Static method: `RateLimit.reset(name, source)`
 Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
@@ -142,6 +160,16 @@ Reset limit for a source ID. The storage entry will be deleted and a new one wil
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
+
+<a name="static-method-ratelimitresponsename-attempt-req-res-next"></a>
+### Static method: `RateLimit.response(name, attempt, req, res, [next])`
+Send rate limit response that is set in the settings.
+
+- `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
+- `attempt` [`AttemptResult`](#interface-attemptresult) The attempt result
+- `req` [`e.Request`](https://expressjs.com/en/api.html#req) Express.js request object
+- `res` [`e.Response`](https://expressjs.com/en/api.html#res) Express.js response object
+- `next` [`e.NextFunction`](https://expressjs.com/en/guide/using-middleware.html) Call next middleware
 
 <a name="static-method-ratelimitsetremainingname-source-remaining"></a>
 ### Static method: `RateLimit.setRemaining(name, source, remaining)`
@@ -203,6 +231,13 @@ The number of requests allowed per time window
 
 - Type: [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)
 
+<a name="ratelimitmiddleware-source"></a>
+### `rateLimit.middleware(source)`
+Express.js middleware to make a rate limit attempt and also send rate limit headers.
+
+- `source` [`RateLimit.SourceFromReq`](#type-ratelimitsourcefromreq) A function that is called with the Express request object and returns a source ID
+- Returns: [`e.RequestHandler`](https://expressjs.com/en/guide/using-middleware.html) Express.js middleware
+
 <a name="ratelimitname"></a>
 ### `rateLimit.name`
 Get rate limit name
@@ -210,11 +245,30 @@ Get rate limit name
 - Type: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)
 - Readonly
 
+<a name="ratelimitrequestsource-req-res"></a>
+### `rateLimit.request(source, req, res)`
+Make a rate limit attempt and also send rate limit headers.
+
+- `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
+- `req` [`e.Request`](https://expressjs.com/en/api.html#req) Express request object
+- `res` [`e.Response`](https://expressjs.com/en/api.html#res) Express response object
+- Returns: [`AttemptResult`](#interface-attemptresult)
+
 <a name="ratelimitresetsource"></a>
 ### `rateLimit.reset(source)`
 Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
 
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
+- Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
+
+<a name="ratelimitresponseattempt-req-res-next"></a>
+### `rateLimit.response(attempt, req, res, [next])`
+Send rate limit response that is set in the settings.
+
+- `attempt` [`AttemptResult`](#interface-attemptresult) The attempt result
+- `req` [`e.Request`](https://expressjs.com/en/api.html#req) Express request object
+- `res` [`e.Response`](https://expressjs.com/en/api.html#res) Express response object
+- `next` [`e.NextFunction`](https://expressjs.com/en/guide/using-middleware.html) Call next middleware
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
 <a name="ratelimitsetremainingsource-remaining"></a>
@@ -271,3 +325,14 @@ Whether this attempt should be allowed to proceed. If false, the attempt is rate
 
 - Type: [`boolean`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type)
 - Readonly
+
+## Namespace: `RateLimit`
+
+<a name="type-ratelimitsourcefromreq"></a>
+## Type: `RateLimit.SourceFromReq`
+A function that is called with the Express request object and returns a source ID
+
+- Type: [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)
+- Parameters:
+  - `req` [`e.Request`](https://expressjs.com/en/api.html#req) The Express request object
+- Returns: [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) A unique source identifier (e.g. username, IP, etc.)
