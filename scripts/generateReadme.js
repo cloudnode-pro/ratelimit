@@ -38,7 +38,7 @@ const testsResult = await new Promise((resolve, reject) => {
         // Get coverage percentage
         const output = data.join("");
         const coverage = (output.match(/----(?:\n|.)+/g) ?? []).pop() ?? "";
-        const percentages = coverage.match(/All files\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?/) ?? [];
+        const percentages = coverage.match(/All files\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?/) ?? [];
         const averageCoverage = percentages.slice(1).reduce((a, b) => a + Number.parseFloat(b), 0) / 4;
         resolve({coverage: averageCoverage, testsPass: code === 0});
     });
