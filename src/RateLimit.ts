@@ -9,18 +9,21 @@ export class RateLimit {
      * Rate limit instances
      * @private
      * @static
+     * @type {Map<string, RateLimit>}
      */
     static #instances = new Map<string, RateLimit>();
 
     /**
      * Whether this rate limit is deleted
      * @private
+     * @type {boolean}
      */
     #deleted = false;
 
     /**
      * Attempts memory
      * @private
+     * @type {Map<string, [number, number]>}
      */
     #attempts = new Map<string, [number, number]>();
 
@@ -71,6 +74,7 @@ export class RateLimit {
      * @param {number} limit - The number of requests allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
      * @param {RateLimitSettings|Record<string, any>} [settings] - Settings for this rate limit
+     * @returns {RateLimit}
      * @throws {Error} - If the rate limit already exists
      */
     constructor(name: string, limit: number, timeWindow: number, settings?: RateLimitSettings | Record<string, any>) {
@@ -85,27 +89,33 @@ export class RateLimit {
     /**
      * Check the attempt state for a source ID without decrementing the remaining attempts
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @param {function(AttemptResult): void} [callback] - Return data in a callback
+     * @returns {AttemptResult}
      */
-    check(source: string): AttemptResult {
+    check(source: string, callback?: (result: AttemptResult) => void): AttemptResult {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const attempts = this.#attempts.get(source) ?? [0, Date.now()];
         const remaining = this.limit - attempts[0];
         const reset = Math.ceil((attempts[1] + (this.timeWindow * 1000) - Date.now()) / 1000);
-        return {
+        const result: AttemptResult = {
             limit: this.limit,
             remaining,
             reset,
             rateLimit: this,
             allow: remaining > 0
         };
+        if (callback) callback(result);
+        return result;
     }
 
     /**
      * Make an attempt with a source ID
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      * @param {number} [attempts=1] - The number of attempts to make
+     * @param {function(AttemptResult): void} [callback] - Return data in a callback
+     * @returns {AttemptResult}
      */
-    attempt(source: string, attempts: number = 1): AttemptResult {
+    attempt(source: string, attempts: number = 1, callback?: (result: AttemptResult) => void): AttemptResult {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const data = this.#attempts.get(source) ?? [0, Date.now()];
         // if the time window has expired, reset the attempts
@@ -116,12 +126,13 @@ export class RateLimit {
         // increment the attempts
         data[0] += attempts;
         this.#attempts.set(source, data);
-        return this.check(source);
+        return this.check(source, callback);
     }
 
     /**
      * Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @returns {void}
      */
     reset(source: string): void {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
@@ -151,6 +162,7 @@ export class RateLimit {
      * > **Warning**: This is not recommended as the remaining attempts depend on the limit of the instance.
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      * @param {number} remaining - The number of remaining attempts
+     * @returns {void}
      */
     setRemaining(source: string, remaining: number): void {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
@@ -161,6 +173,7 @@ export class RateLimit {
 
     /**
      * Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
+     * @returns {void}
      */
     clear(): void {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
@@ -169,6 +182,7 @@ export class RateLimit {
 
     /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
+     * @returns {void}
      */
     delete(): void {
         this.clear();
@@ -179,6 +193,7 @@ export class RateLimit {
     /**
      * Get a rate limit instance
      * @param {string} name - The name of the rate limit
+     * @returns {RateLimit | null}
      * @static
      */
     static get(name: string): RateLimit | null {
@@ -189,13 +204,15 @@ export class RateLimit {
      * Check the attempt state for a source ID without decrementing the remaining attempts
      * @param {string} name - The name of the rate limit
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @param {function(AttemptResult): void} [callback] - Return data in a callback
+     * @returns {AttemptResult}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
-    static check(name: string, source: string): AttemptResult {
+    static check(name: string, source: string, callback?: (result: AttemptResult) => void): AttemptResult {
         const rateLimit = RateLimit.get(name);
         if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
-        return rateLimit.check(source);
+        return rateLimit.check(source, callback);
     }
 
     /**
@@ -203,19 +220,22 @@ export class RateLimit {
      * @param {string} name - The name of the rate limit
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      * @param {number} [attempts=1] - The number of attempts to make
+     * @param {function(AttemptResult): void} [callback] - Return data in a callback
+     * @returns {AttemptResult}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
-    static attempt(name: string, source: string, attempts: number = 1): AttemptResult {
+    static attempt(name: string, source: string, attempts: number = 1, callback?: (result: AttemptResult) => void): AttemptResult {
         const rateLimit = RateLimit.get(name);
         if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
-        return rateLimit.attempt(source, attempts);
+        return rateLimit.attempt(source, attempts, callback);
     }
 
     /**
      * Reset limit for a source ID. The storage entry will be deleted and a new one will be created on the next attempt.
      * @param {string} name - The name of the rate limit
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @returns {void}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
@@ -231,6 +251,7 @@ export class RateLimit {
      * @param {string} name - The name of the rate limit
      * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
      * @param {number} remaining - The number of remaining attempts
+     * @returns {void}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
@@ -243,6 +264,7 @@ export class RateLimit {
     /**
      * Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
      * @param {string} name - The name of the rate limit
+     * @returns {void}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
@@ -255,6 +277,7 @@ export class RateLimit {
     /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      * @param {string} name - The name of the rate limit
+     * @returns {void}
      * @throws {Error} - If the rate limit does not exist
      * @static
      */
@@ -269,6 +292,7 @@ export class RateLimit {
      * @param {string} name - The name of the rate limit
      * @param {number} limit - The number of attempts allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
+     * @returns {RateLimit}
      * @static
      */
     static create(name: string, limit: number, timeWindow: number): RateLimit {

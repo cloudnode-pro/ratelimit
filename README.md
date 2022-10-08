@@ -39,8 +39,8 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	<summary>Table of contents</summary>
 
 - [Class: `RateLimit`](#class-ratelimit)
-	- [Static method: `RateLimit.attempt(name, source, [attempts])`](#static-method-ratelimitattemptname-source-attempts)
-	- [Static method: `RateLimit.check(name, source)`](#static-method-ratelimitcheckname-source)
+	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
+	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callbac)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
 	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
@@ -48,8 +48,8 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [Static method: `RateLimit.reset(name, source)`](#static-method-ratelimitresetname-source)
 	- [Static method: `RateLimit.setRemaining(name, source, remaining)`](#static-method-ratelimitsetremainingname-source-remaining)
 	- [`new RateLimit(name, limit, timeWindow)`](#new-ratelimitname-limit-timewindow)
-	- [`rateLimit.attempt(source, [attempts])`](#ratelimitattemptsource-attempts)
-	- [`rateLimit.check(source)`](#ratelimitchecksource)
+	- [`rateLimit.attempt(source, [attempts], [callback])`](#ratelimitattemptsource-attempts-callback)
+	- [`rateLimit.check(source, [callback])`](#ratelimitchecksource-callback)
 	- [`rateLimit.clear()`](#ratelimitclear)
 	- [`rateLimit.delete()`](#ratelimitdelete)
 	- [`rateLimit.limit`](#ratelimitlimit)
@@ -69,22 +69,28 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 ## Class: `RateLimit`
 Rate limit
 
-<a name="static-method-ratelimitattemptname-source-attempts"></a>
-### Static method: `RateLimit.attempt(name, source, [attempts])`
+<a name="static-method-ratelimitattemptname-source-attempts-callback"></a>
+### Static method: `RateLimit.attempt(name, source, [attempts], [callback])`
 Make an attempt with a source ID
 
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
 - `attempts` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts to make. Default: `1`
+- `callback` [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) Callback function. Default: `undefined`
+  - `result` [`AttemptResult`](#interface-attemptresult) The result of the attempt
+  - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Returns: [`AttemptResult`](#interface-attemptresult)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
-<a name="static-method-ratelimitcheckname-source"></a>
-### Static method: `RateLimit.check(name, source)`
+<a name="static-method-ratelimitcheckname-source-callbac"></a>
+### Static method: `RateLimit.check(name, source, [callback])`
 Check the attempt state for a source ID without decrementing the remaining attempts
 
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
+- `callback` [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) Callback function. Default: `undefined`
+  - `result` [`AttemptResult`](#interface-attemptresult) The result of the attempt
+  - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Returns: [`AttemptResult`](#interface-attemptresult)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
 
@@ -150,19 +156,25 @@ Create a new rate limit
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit already exists
 
-<a name="ratelimitattemptsource-attempts"></a>
-### `rateLimit.attempt(source, [attempts])`
+<a name="ratelimitattemptsource-attempts-callback"></a>
+### `rateLimit.attempt(source, [attempts], [callback])`
 Make an attempt with a source ID
 
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
 - `attempts` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts to make. Default: `1`
+- `callback` [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) Callback function
+  - `result` [`AttemptResult`](#interface-attemptresult) The result of the attempt
+  - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
-<a name="ratelimitchecksource"></a>
-### `rateLimit.check(source)`
+<a name="ratelimitchecksource-callback"></a>
+### `rateLimit.check(source, [callback])`
 Check the attempt state for a source ID without decrementing the remaining attempts
 
 - `source` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) Unique source identifier (e.g. username, IP, etc.)
+- `callback` [`function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) Callback function
+  - `result` [`AttemptResult`](#interface-attemptresult) The result of the attempt
+  - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Returns: [`AttemptResult`](#interface-attemptresult)
 
 <a name="ratelimitclear"></a>
