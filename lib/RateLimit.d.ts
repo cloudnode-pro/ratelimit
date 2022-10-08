@@ -1,6 +1,14 @@
 import { AttemptResult } from "./AttemptResult";
 import { RateLimitSettings } from "./RateLimitSettings";
 import e from "express";
+export declare namespace RateLimit {
+    /**
+     * A function that is called with the Express request object and returns a source ID
+     * @param {e.Request} req The Express request object
+     * @returns {string} A unique source identifier (e.g. username, IP, etc.)
+     */
+    type SourceFromReq = (req: e.Request) => string;
+}
 /**
  * Rate limit
  * @class
@@ -84,7 +92,7 @@ export declare class RateLimit {
     response(attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction): void;
     /**
      * Express.js middleware to make a rate limit attempt and also send rate limit headers.
-     * @param {function(e.Request): string} source - A function that is called with the Express request object and returns a unique source identifier (e.g. username, IP, etc.)
+     * @param {RateLimit.SourceFromReq} source - A function that is called with the Express request object and returns a source ID
      * @returns {e.RequestHandler}
      */
     middleware(source: (req: e.Request) => string): e.RequestHandler;
@@ -171,8 +179,7 @@ export declare class RateLimit {
     /**
      * Express.js middleware to make a rate limit attempt and also send rate limit headers.
      * @param {string} name - The name of the rate limit
-     * @param {function(e.Request): string} source - A function that is called with the Express request object and
-     * returns a unique source identifier (e.g. username, IP, etc.)
+     * @param {RateLimit.SourceFromReq} source - A function that is called with the Express request object and returns a source ID
      * @returns {e.RequestHandler}
      * @throws {Error} - If the rate limit does not exist
      * @static
