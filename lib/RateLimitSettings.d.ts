@@ -31,11 +31,13 @@ export interface RateLimitSettings {
         /**
          * Indicates the number of seconds until the quota resets.
          * @type {string | null}
+         * @default 'RateLimit-Reset'
          */
         reset: string | null;
         /**
          * Indicates the quota associated to the client and its value is informative. See [IETF RateLimit Fields for HTTP, Section 2.3](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers#section-2.3)
          * @type {string | null}
+         * @default 'RateLimit-Policy'
          * @experimental Policy reporting is not implemented yet. This is reserved for future use.
          * @TODO Implement policy reporting
          */
