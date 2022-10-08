@@ -396,12 +396,13 @@ export class RateLimit {
      * @param {string} name - The name of the rate limit
      * @param {number} limit - The number of attempts allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
+     * @param {RateLimitSettings|Record<string, any>} [settings] - Settings for this rate limit
      * @returns {RateLimit}
      * @static
      */
-    static create(name: string, limit: number, timeWindow: number): RateLimit {
+    static create(name: string, limit: number, timeWindow: number, settings?: RateLimitSettings | Record<string, any>): RateLimit {
         const existing = RateLimit.get(name);
         if (existing) return existing;
-        return new RateLimit(name, limit, timeWindow);
+        return new RateLimit(name, limit, timeWindow, settings);
     }
 }
