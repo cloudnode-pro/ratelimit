@@ -69,6 +69,8 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
     - [`attemptResult.reset`](#attemptresultreset)
     - [`attemptResult.rateLimit`](#attemptresultratelimit)
     - [`attemptResult.allow`](#attemptresultallow)
+- [Namespace: `RateLimit`](#namespace-ratelimit)
+  - [Type: `SourceFromReq`](#type-sourcefromreq) 
 </details>
 
 <a name="class-ratelimit"></a>
