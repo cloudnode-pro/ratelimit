@@ -38,8 +38,8 @@ const testsResult = await new Promise((resolve, reject) => {
         // Get coverage percentage
         const output = data.join("");
         const coverage = (output.match(/----(?:\n|.)+/g) ?? []).pop() ?? "";
-        const percentages = coverage.match(/All files\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?\|\s*?(\d+)\s*?/) ?? [];
-        const averageCoverage = percentages.slice(1).reduce((a, b) => a + parseInt(b, 10), 0) / 4;
+        const percentages = coverage.match(/All files\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?\|\s*?([\d.]+)\s*?/) ?? [];
+        const averageCoverage = Math.round(percentages.slice(1).reduce((a, b) => a + Number.parseFloat(b), 0) / 4);
         resolve({coverage: averageCoverage, testsPass: code === 0});
     });
 });
@@ -47,7 +47,7 @@ const testsResult = await new Promise((resolve, reject) => {
 /**
  * Coverage colors
  */
-const coverageColors = ["16a34a", "84cc16", "eab308", "f59e0b", "f97316", "ef4444"];
+const coverageColors = ["16a34a", "ca8a04", "f97316", "ef4444", "b91c1c"];
 
 /**
  * Determine if the build passes by the exit code of `npm run build`
