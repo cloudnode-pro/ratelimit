@@ -1,13 +1,7 @@
 name: Unit tests
 'on':
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-  schedule:
-    - cron: '0 6 * * 0'
-
+    types: [ opened, synchronize, reopened ]
 jobs:
   test:
     name: 'Node.js v${{ matrix.node }}'
