@@ -2,6 +2,9 @@ name: Unit tests
 'on':
   pull_request:
     types: [ opened, synchronize, reopened ]
+  push:
+    branches:
+      - 'main'
 jobs:
   test:
     name: 'Node.js v${{ matrix.node }}'
