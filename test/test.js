@@ -56,6 +56,12 @@ describe("RateLimit", () => {
             assert.strictEqual(rateLimit.check("source2").remaining, 5);
             assert.strictEqual(rateLimit.check("source3").remaining, 5);
         });
+        it("should return check result in callback", () => {
+            const rateLimit = RateLimit.get("test");
+            rateLimit.check("source1", result => {
+                assert.strictEqual(result.allow, true);
+            });
+        });
         it("should delete the RateLimit instance", () => {
             const rateLimit = RateLimit.get("test");
             rateLimit.attempt("source1");
