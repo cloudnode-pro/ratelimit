@@ -1,4 +1,15 @@
 import {AttemptResult} from "./AttemptResult";
+import {RateLimitSettings} from "./RateLimitSettings";
+import e from "express";
+
+export namespace RateLimit {
+    /**
+     * A function that is called with the Express request object and returns a source ID
+     * @param {e.Request} req The Express request object
+     * @returns {string} A unique source identifier (e.g. username, IP, etc.)
+     */
+    export type SourceFromReq = (req: e.Request) => string;
+}
 
 /**
  * Rate limit
@@ -28,16 +39,43 @@ export class RateLimit {
     #attempts = new Map<string, [number, number]>();
 
     /**
+     * Global rate limit settings. These will apply to all rate limits.
+     * @type {RateLimitSettings}
+     * @static
+     */
+    static settings: RateLimitSettings = {
+        sendHeaders: true,
+        headers: {
+            limit: "RateLimit-Limit",
+            remaining: "RateLimit-Remaining",
+            reset: "RateLimit-Reset",
+            //policy: "RateLimit-Policy"
+            policy: null
+        },
+        resetHeaderValue: (reset: number) => reset.toString(),
+        defaultResponse: (attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction) => {
+            process.emitWarning("You are using the default rate limit response", {
+                code: "RATELIMIT_DEFAULT_RESPONSE",
+                detail: "This is not recommended. Please set a custom response by modifying the rate limit settings (`RateLimit.settings.defaultResponse` or `RateLimit.settings.defaultResponse`). Check the documentation for more information."
+            });
+            res.set("Retry-After", attempt.reset.toString());
+            res.status(429).send("Too Many Requests");
+        }
+    };
+
+    /**
      * Name of the rate limit
      * @readonly
      * @type {string}
      */
     readonly name: string;
+
     /**
      * The number of requests allowed per time window
      * @type {number}
      */
     limit: number;
+
     /**
      * The time window in seconds (e.g. 60)
      * @type {number}
@@ -45,18 +83,26 @@ export class RateLimit {
     timeWindow: number;
 
     /**
+     * Settings for this rate limit
+     * @type {RateLimitSettings}
+     */
+    settings: RateLimitSettings = RateLimit.settings;
+
+    /**
      * Create a new rate limit
      * @param {string} name - The name of the rate limit
      * @param {number} limit - The number of requests allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
+     * @param {RateLimitSettings|Record<string, any>} [settings] - Settings for this rate limit
      * @returns {RateLimit}
      * @throws {Error} - If the rate limit already exists
      */
-    constructor(name: string, limit: number, timeWindow: number) {
+    constructor(name: string, limit: number, timeWindow: number, settings?: RateLimitSettings | Record<string, any>) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
         this.name = name;
         this.limit = limit;
         this.timeWindow = timeWindow;
+        if (settings) Object.assign(this.settings, settings);
         RateLimit.#instances.set(name, this);
     }
 
@@ -111,6 +157,53 @@ export class RateLimit {
     reset(source: string): void {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         this.#attempts.delete(source);
+    }
+
+    /**
+     * Make a rate limit attempt and also send rate limit headers.
+     * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @param {e.Request} req - An Express request object
+     * @param {e.Response} res - An Express response object
+     * @returns {AttemptResult}
+     */
+    request(source: string, req: e.Request, res: e.Response): AttemptResult {
+        const result = this.attempt(source);
+        if (this.settings.sendHeaders) {
+            if (this.settings.headers.limit !== null) res.setHeader(this.settings.headers.limit, this.limit);
+            if (this.settings.headers.remaining !== null) res.setHeader(this.settings.headers.remaining, result.remaining.toString());
+            if (this.settings.headers.reset !== null) res.setHeader(this.settings.headers.reset, this.settings.resetHeaderValue(result.reset));
+            if (this.settings.headers.policy !== null) res.setHeader(this.settings.headers.policy, "not implemented");
+        }
+        return result;
+    }
+
+    /**
+     * Send rate limit response that is set in the settings.
+     * @param {AttemptResult} attempt - The attempt result
+     * @param {e.Request} req - An Express request object
+     * @param {e.Response} res - An Express response object
+     * @param {e.NextFunction} [next] - Call next middleware
+     * @returns {void}
+     */
+    response(attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction): void {
+        RateLimit.response(this.name, attempt, req, res, next);
+    }
+
+    /**
+     * Express.js middleware to make a rate limit attempt and also send rate limit headers.
+     * @param {RateLimit.SourceFromReq} source - A function that is called with the Express request object and returns a source ID
+     * @returns {e.RequestHandler}
+     */
+    middleware(source: (req: e.Request) => string): e.RequestHandler {
+        return (req, res, next) => {
+            const result = this.request(source(req), req, res);
+            if (!result.allow) this.response(result, req, res, next);
+            else if (next) next();
+            else {
+                process.emitWarning("No next function provided to rate limit middleware");
+                res.end();
+            }
+        };
     }
 
     /**
@@ -202,6 +295,61 @@ export class RateLimit {
     }
 
     /**
+     * Make a rate limit attempt and also send rate limit headers.
+     * @param {string} name - The name of the rate limit
+     * @param {string} source - Unique source identifier (e.g. username, IP, etc.)
+     * @param {e.Request} req - An Express request object
+     * @param {e.Response} res - An Express response object
+     * @returns {AttemptResult}
+     * @throws {Error} - If the rate limit does not exist
+     * @static
+     */
+    static request(name: string, source: string, req: e.Request, res: e.Response): AttemptResult {
+        const rateLimit = RateLimit.get(name);
+        if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
+        return rateLimit.request(source, req, res);
+    }
+
+    /**
+     * Send rate limit response that is set in the settings.
+     * @param {string} [name=null] - The name of the rate limit. Set to `null` to use global settings. Rate limit instances
+     * that have not explicitly set a response will automatically inherit the global response setting at the time of
+     * construction.
+     * @param {AttemptResult} attempt - The attempt result
+     * @param {e.Request} req - An Express request object
+     * @param {e.Response} res - An Express response object
+     * @param {e.NextFunction} [next] - An Express next function
+     * @returns {void}
+     * @throws {Error} - If the rate limit does not exist (never thrown if `name` is `null`)
+     * @static
+     */
+    static response(name: string = "null", attempt: AttemptResult, req: e.Request, res: e.Response, next?: e.NextFunction): void {
+        // get the function from local or global settings if the name is null
+        const fn = name !== null ? (() => {
+            // using a function here in the ternary, so we can get the rate limit instance
+            // and throw an error if it doesn't exist.
+            const rateLimit = RateLimit.get(name);
+            if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
+            return rateLimit.settings.defaultResponse;
+        })() : RateLimit.settings.defaultResponse;
+        fn(attempt, req, res, next);
+    }
+
+    /**
+     * Express.js middleware to make a rate limit attempt and also send rate limit headers.
+     * @param {string} name - The name of the rate limit
+     * @param {RateLimit.SourceFromReq} source - A function that is called with the Express request object and returns a source ID
+     * @returns {e.RequestHandler}
+     * @throws {Error} - If the rate limit does not exist
+     * @static
+     */
+    static middleware(name: string, source: (req: e.Request) => string): e.RequestHandler {
+        const rateLimit = RateLimit.get(name);
+        if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
+        return rateLimit.middleware(source);
+    }
+
+    /**
      * Set the remaining attempts for a source ID.
      * > **Warning**: This is not recommended as the remaining attempts depend on the limit of the instance.
      * @param {string} name - The name of the rate limit
@@ -248,12 +396,13 @@ export class RateLimit {
      * @param {string} name - The name of the rate limit
      * @param {number} limit - The number of attempts allowed per time window (e.g. 60)
      * @param {number} timeWindow - The time window in seconds (e.g. 60)
+     * @param {RateLimitSettings|Record<string, any>} [settings] - Settings for this rate limit
      * @returns {RateLimit}
      * @static
      */
-    static create(name: string, limit: number, timeWindow: number): RateLimit {
+    static create(name: string, limit: number, timeWindow: number, settings?: RateLimitSettings | Record<string, any>): RateLimit {
         const existing = RateLimit.get(name);
         if (existing) return existing;
-        return new RateLimit(name, limit, timeWindow);
+        return new RateLimit(name, limit, timeWindow, settings);
     }
 }
