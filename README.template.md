@@ -40,7 +40,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 
 - [Class: `RateLimit`](#class-ratelimit)
 	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
-	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callbac)
+	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callback)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
 	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
