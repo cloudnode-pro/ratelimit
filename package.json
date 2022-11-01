@@ -20,8 +20,8 @@
     "limit",
     "ratelimit",
     "ratelimiter",
-    "limiter",
-    "limit"
+    "limit",
+    "cloudnode"
   ],
   "author": "Cloudnode",
   "license": "GPL-3.0",
