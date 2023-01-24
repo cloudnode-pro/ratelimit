@@ -1,6 +1,6 @@
 {
   "name": "cldn-ratelimit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Simple ratelimiter for Node.js",
   "main": "lib/RateLimit.js",
   "type": "module",
