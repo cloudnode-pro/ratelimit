@@ -34,6 +34,8 @@ attemptLogin("john.doe", "password123"); //-> "success"
 
 If you want to reset the rate limit after a successful login, call [`rateLimit.reset(username)`](#ratelimitresetsource).
 
+To prevent building-up of memory usage, you should call [`RateLimit.cleanup()`](#static-method-ratelimitcleanupname) periodically. This will remove rate limits that have not been used for a while.
+
 # Documentation
 <details open>
 	<summary>Table of contents</summary>
@@ -42,6 +44,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
 	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callback)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
+    - [Static method: `RateLimit.cleanup([name])`](#static-method-ratelimitcleanupname)
 	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
 	- [Static method: `RateLimit.get(name)`](#static-method-ratelimitgetname)
@@ -51,6 +54,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [`rateLimit.attempt(source, [attempts], [callback])`](#ratelimitattemptsource-attempts-callback)
 	- [`rateLimit.check(source, [callback])`](#ratelimitchecksource-callback)
 	- [`rateLimit.clear()`](#ratelimitclear)
+    - [`rateLimit.cleanup()`](#ratelimitcleanup)
 	- [`rateLimit.delete()`](#ratelimitdelete)
 	- [`rateLimit.limit`](#ratelimitlimit)
 	- [`rateLimit.name`](#ratelimitname)
@@ -101,6 +105,13 @@ Clear rate limit attempts storage. This is equivalent to resetting all rate limi
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
+
+<a name="static-method-ratelimitcleanupname"></a>
+
+### Static method: `RateLimit.cleanup([name])`
+Clean up rate limit attempts storage. This will remove expired entries.
+
+- `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit. Default: `undefined`
 
 <a name="static-method-ratelimitcreatename-limit-timewindow"></a>
 ### Static method: `RateLimit.create(name, limit, timeWindow)`
@@ -180,6 +191,12 @@ Check the attempt state for a source ID without decrementing the remaining attem
 <a name="ratelimitclear"></a>
 ### `rateLimit.clear()`
 Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
+
+- Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
+
+<a name="ratelimitcleanup"></a>
+### `rateLimit.cleanup()`
+Clean up rate limit attempts storage. This will remove expired entries.
 
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 
