@@ -65,6 +65,11 @@ export declare class RateLimit {
      */
     clear(): void;
     /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @throws {Error} - If the rate limit has been deleted
+     */
+    cleanup(): void;
+    /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      * @returns {void}
      */
@@ -125,6 +130,12 @@ export declare class RateLimit {
      * @static
      */
     static clear(name: string): void;
+    /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @param [name] - The name of the rate limit. If not provided, all rate limits will be cleaned up.
+     * @throws {Error} - If the rate limit does not exist
+     */
+    static cleanup(name?: string): void;
     /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      * @param {string} name - The name of the rate limit

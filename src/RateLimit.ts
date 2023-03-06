@@ -137,6 +137,18 @@ export class RateLimit {
     }
 
     /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @throws {Error} - If the rate limit has been deleted
+     */
+    public cleanup(): void {
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
+        const now = Date.now();
+        for (const [source, data] of this.#attempts) {
+            if (data[1] + (this.timeWindow * 1000) < now) this.#attempts.delete(source);
+        }
+    }
+
+    /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      * @returns {void}
      */
@@ -228,6 +240,20 @@ export class RateLimit {
         const rateLimit = RateLimit.get(name);
         if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
         return rateLimit.clear();
+    }
+
+    /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @param [name] - The name of the rate limit. If not provided, all rate limits will be cleaned up.
+     * @throws {Error} - If the rate limit does not exist
+     */
+    public static cleanup(name?: string): void {
+        if (name) {
+            const rateLimit = RateLimit.get(name);
+            if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
+            return rateLimit.cleanup();
+        }
+        else for (const rateLimit of RateLimit.#instances.values()) rateLimit.cleanup();
     }
 
     /**
