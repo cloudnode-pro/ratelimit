@@ -32,7 +32,7 @@
   "homepage": "https://github.com/cloudnode-pro/ratelimit#readme",
   "devDependencies": {
     "c8": "^8.0.1",
-    "mocha": "^10.0.0"
-  },
-  "dependencies": {}
+    "mocha": "^10.0.0",
+    "typescript": "^5.2.2"
+  }
 }

@@ -1,8 +1,10 @@
 # Rate limiting utility
-{{shield:version}}
+[![npm](https://img.shields.io/npm/v/cldn-ratelimit)](https://www.npmjs.com/package/cldn-ratelimit)
+[![npm downloads](https://img.shields.io/npm/dt/cldn-ratelimit?label=downloads)](https://www.npmjs.com/package/cldn-ratelimit)
 {{shield:tests}}
 {{shield:coverage}}
 {{shield:build}}
+[![CodeQL](https://github.com/cloudnode-pro/ratelimit/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/cloudnode-pro/ratelimit/actions/workflows/github-code-scanning/codeql)
 
 A relatively simple utility for abstract rate limiting. This library uses memory storage (i.e. does not rely on external database or writing data on your file system). Rate limits are reset if the process is restarted.
 
