@@ -231,7 +231,8 @@ export class RateLimit {
     public static delete(name: string): void {
         const rateLimit = RateLimit.get(name);
         if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
-        return rateLimit.delete();
+        rateLimit.delete();
+        RateLimit.#instances.delete(name);
     }
 
     /**
