@@ -137,6 +137,7 @@ describe("RateLimit", () => {
             new RateLimit("test2", 5, 1).attempt("source1");
             await sleep(1500);
             RateLimit.cleanup();
+            RateLimit.delete("test2");
         });
         it("should delete the RateLimit instance", () => {
             RateLimit.attempt("test", "source1");
