@@ -1,5 +1,5 @@
 # Rate limiting utility
-![version: 1.2.1](https://img.shields.io/badge/version-1.2.1-%233b82f6)
+![version: 1.2.2](https://img.shields.io/badge/version-1.2.2-%233b82f6)
 ![test: passing](https://img.shields.io/badge/tests-passing-%2316a34a)
 ![coverage: 100%](https://img.shields.io/badge/coverage-100%25-%2316a34a)
 ![build: passing](https://img.shields.io/badge/build-passing-%2316a34a)
@@ -42,6 +42,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [Static method: `RateLimit.attempt(name, source, [attempts], [callback])`](#static-method-ratelimitattemptname-source-attempts-callback)
 	- [Static method: `RateLimit.check(name, source, [callback])`](#static-method-ratelimitcheckname-source-callback)
 	- [Static method: `RateLimit.clear(name)`](#static-method-ratelimitclearname)
+    - [Static method: `RateLimit.cleanup([name])`](#static-method-ratelimitcleanupname)
 	- [Static method: `RateLimit.create(name, limit, timeWindow)`](#static-method-ratelimitcreatename-limit-timewindow)
 	- [Static method: `RateLimit.delete(name)`](#static-method-ratelimitdeletename)
 	- [Static method: `RateLimit.get(name)`](#static-method-ratelimitgetname)
@@ -51,6 +52,7 @@ If you want to reset the rate limit after a successful login, call [`rateLimit.r
 	- [`rateLimit.attempt(source, [attempts], [callback])`](#ratelimitattemptsource-attempts-callback)
 	- [`rateLimit.check(source, [callback])`](#ratelimitchecksource-callback)
 	- [`rateLimit.clear()`](#ratelimitclear)
+    - [`rateLimit.cleanup()`](#ratelimitcleanup)
 	- [`rateLimit.delete()`](#ratelimitdelete)
 	- [`rateLimit.limit`](#ratelimitlimit)
 	- [`rateLimit.name`](#ratelimitname)
@@ -101,6 +103,13 @@ Clear rate limit attempts storage. This is equivalent to resetting all rate limi
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit does not exist
+
+<a name="static-method-ratelimitcleanupname"></a>
+
+### Static method: `RateLimit.cleanup([name])`
+Clean up rate limit attempts storage. This will remove expired entries.
+
+- `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit. Default: `undefined`
 
 <a name="static-method-ratelimitcreatename-limit-timewindow"></a>
 ### Static method: `RateLimit.create(name, limit, timeWindow)`
@@ -154,6 +163,7 @@ Create a new rate limit
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
+- `cleanupInterval` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) Cleanup interval in seconds (see [`rateLimit.cleanup()`](#ratelimitcleanup)). Set to `-1` to disable periodic cleanup. Defaults to `timeWindow`
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit already exists
 
 <a name="ratelimitattemptsource-attempts-callback"></a>
@@ -180,6 +190,12 @@ Check the attempt state for a source ID without decrementing the remaining attem
 <a name="ratelimitclear"></a>
 ### `rateLimit.clear()`
 Clear rate limit attempts storage. This is equivalent to resetting all rate limits.
+
+- Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
+
+<a name="ratelimitcleanup"></a>
+### `rateLimit.cleanup()`
+Clean up rate limit attempts storage. This will remove expired entries.
 
 - Returns: [`void`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type)
 

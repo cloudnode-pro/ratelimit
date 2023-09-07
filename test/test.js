@@ -72,6 +72,7 @@ describe("RateLimit", () => {
             assert.throws(() => rateLimit.reset("source1"), {message: "Rate limit \"test\" has been deleted. Construct a new instance"});
             assert.throws(() => rateLimit.setRemaining("source1", 3), {message: "Rate limit \"test\" has been deleted. Construct a new instance"});
             assert.throws(() => rateLimit.clear(), {message: "Rate limit \"test\" has been deleted. Construct a new instance"});
+            assert.throws(() => rateLimit.cleanup(), {message: "Rate limit \"test\" has been deleted. Construct a new instance"});
             assert.throws(() => rateLimit.delete(), {message: "Rate limit \"test\" has been deleted. Construct a new instance"});
         });
     });
@@ -123,6 +124,21 @@ describe("RateLimit", () => {
             assert.strictEqual(RateLimit.check("test", "source2").remaining, 5);
             assert.strictEqual(RateLimit.check("test", "source3").remaining, 5);
         });
+        it("should clear expired attempts", async () => {
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+            RateLimit.attempt("test", "source1");
+            await sleep(1500);
+            RateLimit.cleanup("test");
+            assert.strictEqual(RateLimit.check("test", "source1").remaining, 5);
+        });
+        it("should clear expired attempts from all rate limits", async () => {
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+            RateLimit.attempt("test", "source1");
+            new RateLimit("test2", 5, 1).attempt("source1");
+            await sleep(1500);
+            RateLimit.cleanup();
+            RateLimit.delete("test2");
+        });
         it("should delete the RateLimit instance", () => {
             RateLimit.attempt("test", "source1");
             RateLimit.delete("test");
@@ -132,6 +148,7 @@ describe("RateLimit", () => {
             assert.throws(() => RateLimit.reset("test", "source1"), {message: "Rate limit with name \"test\" does not exist"});
             assert.throws(() => RateLimit.setRemaining("test", "source1", 3), {message: "Rate limit with name \"test\" does not exist"});
             assert.throws(() => RateLimit.clear("test"), {message: "Rate limit with name \"test\" does not exist"});
+            assert.throws(() => RateLimit.cleanup("test"), {message: "Rate limit with name \"test\" does not exist"});
             assert.throws(() => RateLimit.delete("test"), {message: "Rate limit with name \"test\" does not exist"});
         });
     });

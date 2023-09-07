@@ -23,15 +23,23 @@ export class RateLimit {
     readonly #attempts = new Map<string, [number, number]>();
 
     /**
+     * Cleanup timer
+     * @internal
+     */
+    readonly #cleanupTimer?: number;
+
+    /**
      * Create a new rate limit
      * @param name - The name of the rate limit
      * @param limit - The number of requests allowed per time window (e.g. 60)
      * @param timeWindow - The time window in seconds (e.g. 60)
+     * @param [cleanupInterval=timeWindow] - Cleanup interval in seconds (see {@link RateLimit#cleanup}). Set to `-1` to disable periodic cleanup. Defaults to `timeWindow`
      * @throws {Error} - If the rate limit already exists
      */
-    public constructor(public readonly name: string, public readonly limit: number, public readonly timeWindow: number) {
+    public constructor(public readonly name: string, public readonly limit: number, public readonly timeWindow: number, cleanupInterval: number = timeWindow) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
         RateLimit.#instances.set(name, this);
+        if (cleanupInterval > 0) this.#cleanupTimer = setInterval(() => this.cleanup(), cleanupInterval * 1000);
     }
 
     /**
@@ -106,12 +114,25 @@ export class RateLimit {
     }
 
     /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @throws {Error} - If the rate limit has been deleted
+     */
+    public cleanup(): void {
+        if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
+        const now = Date.now();
+        for (const [source, [attempts]] of this.#attempts) {
+            if (attempts + (this.timeWindow * 1000) < now) this.#attempts.delete(source);
+        }
+    }
+
+    /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      */
     public delete(): void {
         this.clear();
         this.#deleted = true;
         RateLimit.#instances.delete(this.name);
+        clearInterval(this.#cleanupTimer);
     }
 
     /**
@@ -187,6 +208,20 @@ export class RateLimit {
     }
 
     /**
+     * Clean up rate limit attempts storage. This will remove expired entries.
+     * @param [name] - The name of the rate limit. If not provided, all rate limits will be cleaned up.
+     * @throws {Error} - If the rate limit does not exist
+     */
+    public static cleanup(name?: string): void {
+        if (name) {
+            const rateLimit = RateLimit.get(name);
+            if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
+            return rateLimit.cleanup();
+        }
+        else for (const rateLimit of RateLimit.#instances.values()) rateLimit.cleanup();
+    }
+
+    /**
      * Delete the rate limit instance. After it is deleted, it should not be used any further without constructing a new instance.
      * @param name - The name of the rate limit
      * @throws {Error} - If the rate limit does not exist
@@ -194,7 +229,8 @@ export class RateLimit {
     public static delete(name: string): void {
         const rateLimit = RateLimit.get(name);
         if (!rateLimit) throw new Error(`Rate limit with name "${name}" does not exist`);
-        return rateLimit.delete();
+        rateLimit.delete();
+        RateLimit.#instances.delete(name);
     }
 
     /**
