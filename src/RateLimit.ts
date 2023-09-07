@@ -39,7 +39,9 @@ export class RateLimit {
     public constructor(public readonly name: string, public readonly limit: number, public readonly timeWindow: number, cleanupInterval: number = timeWindow) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
         RateLimit.#instances.set(name, this);
-        if (cleanupInterval > 0) this.#cleanupTimer = setInterval(() => this.cleanup(), cleanupInterval * 1000);
+        if (cleanupInterval > 0) this.#cleanupTimer = setInterval(() => {
+            try{this.cleanup()} catch{}
+        }, cleanupInterval * 1000);
     }
 
     /**
