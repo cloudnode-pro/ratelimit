@@ -143,8 +143,8 @@ export class RateLimit {
     public cleanup(): void {
         if (this.#deleted) throw new Error(`Rate limit "${this.name}" has been deleted. Construct a new instance`);
         const now = Date.now();
-        for (const [source, data] of this.#attempts) {
-            if (data[1] + (this.timeWindow * 1000) < now) this.#attempts.delete(source);
+        for (const [source, [attempts]] of this.#attempts) {
+            if (attempts + (this.timeWindow * 1000) < now) this.#attempts.delete(source);
         }
     }
 
