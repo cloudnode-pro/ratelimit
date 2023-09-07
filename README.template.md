@@ -163,6 +163,7 @@ Create a new rate limit
 - `name` [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) The name of the rate limit
 - `limit` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The number of attempts allowed per time window (e.g. 60)
 - `timeWindow` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) The time window in seconds (e.g. 60)
+- `cleanupInterval` [`number`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) Cleanup interval in seconds (see [`rateLimit.cleanup()`](#ratelimitcleanup)). Set to `-1` to disable periodic cleanup. Defaults to `timeWindow`
 - Throws: [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) If the rate limit already exists
 
 <a name="ratelimitattemptsource-attempts-callback"></a>

@@ -23,15 +23,23 @@ export class RateLimit {
     readonly #attempts = new Map<string, [number, number]>();
 
     /**
+     * Cleanup timer
+     * @internal
+     */
+    readonly #cleanupTimer?: number;
+
+    /**
      * Create a new rate limit
      * @param name - The name of the rate limit
      * @param limit - The number of requests allowed per time window (e.g. 60)
      * @param timeWindow - The time window in seconds (e.g. 60)
+     * @param [cleanupInterval=timeWindow] - Cleanup interval in seconds (see {@link RateLimit#cleanup}). Set to `-1` to disable periodic cleanup. Defaults to `timeWindow`
      * @throws {Error} - If the rate limit already exists
      */
-    public constructor(public readonly name: string, public readonly limit: number, public readonly timeWindow: number) {
+    public constructor(public readonly name: string, public readonly limit: number, public readonly timeWindow: number, cleanupInterval: number = timeWindow) {
         if (RateLimit.#instances.has(name)) throw new Error(`Rate limit with name "${name}" already exists`);
         RateLimit.#instances.set(name, this);
+        if (cleanupInterval > 0) this.#cleanupTimer = setInterval(() => this.cleanup(), cleanupInterval * 1000);
     }
 
     /**
