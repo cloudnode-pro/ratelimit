@@ -1,4 +1,4 @@
-name: Unit tests
+name: Tests
 'on':
   pull_request:
     types: [ opened, synchronize, reopened ]
@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         node:
+          - 20
           - 18
-          - 16
     steps:
       - uses: actions/setup-node@v1
         with:
