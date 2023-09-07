@@ -9,6 +9,7 @@
     "test": "c8 npm run _test",
     "coverage": "c8 --reporter=html npm run _test",
     "build": "npm ci && tsc",
+    "prepack": "npm run build",
     "readme": "node scripts/generateReadme.js"
   },
   "repository": {
