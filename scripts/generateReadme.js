@@ -10,12 +10,6 @@ const TEMPLATE_FILE = "README.template.md";
 const OUTPUT_FILE = "README.md";
 
 /**
- * Determine version from package.json
- */
-const packageJson = JSON.parse(await fs.readFile("package.json", "utf8"));
-const version = packageJson.version;
-
-/**
  * Run test and get coverage
  *
  * If the command exits with 0, the tests pass. Otherwise, the tests have failed.
@@ -30,7 +24,7 @@ const version = packageJson.version;
  *
  * The coverage percentage is the average of all columns for "All files".
  */
-const testsResult = await new Promise((resolve, reject) => {
+const testsResult = await new Promise((resolve) => {
     const child = child_process.spawn("npm", ["test"]);
     const data = [];
     child.stdout.on("data", (chunk) => data.push(chunk));
@@ -52,7 +46,7 @@ const coverageColors = ["16a34a", "ca8a04", "f97316", "ef4444", "b91c1c"];
 /**
  * Determine if the build passes by the exit code of `npm run build`
  */
-const buildPass = await new Promise((resolve, reject) => {
+const buildPass = await new Promise((resolve) => {
     const child = child_process.spawn("npm", ["run", "build"]);
     child.on("exit", (code) => resolve(code === 0));
 });
@@ -63,7 +57,6 @@ const buildPass = await new Promise((resolve, reject) => {
  * {{variable_name}}
  */
 const variables = {
-    "shield:version": `![version: ${version}](https://img.shields.io/badge/version-${version}-%233b82f6)`,
     "shield:tests": `![test: ${testsResult.testsPass ? "passing" : "failing"}](https://img.shields.io/badge/tests-${testsResult.testsPass ? "passing" : "failing"}-${testsResult.testsPass ? "%2316a34a" : "%23ef4444"})`,
     "shield:coverage": `![coverage: ${testsResult.coverage}%](https://img.shields.io/badge/coverage-${testsResult.coverage}%25-%23${coverageColors.reverse()[Math.floor(testsResult.coverage * (coverageColors.length - 1) / 100)]})`,
     "shield:build": `![build: ${buildPass ? "passing" : "failing"}](https://img.shields.io/badge/build-${buildPass ? "passing" : "failing"}-${buildPass ? "%2316a34a" : "%23ef4444"})`,
