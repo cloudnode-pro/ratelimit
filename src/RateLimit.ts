@@ -134,6 +134,7 @@ export class RateLimit {
         this.clear();
         this.#deleted = true;
         RateLimit.#instances.delete(this.name);
+        clearInterval(this.#cleanupTimer);
     }
 
     /**
