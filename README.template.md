@@ -34,8 +34,6 @@ attemptLogin("john.doe", "password123"); //-> "success"
 
 If you want to reset the rate limit after a successful login, call [`rateLimit.reset(username)`](#ratelimitresetsource).
 
-To prevent building-up of memory usage, you should call [`RateLimit.cleanup()`](#static-method-ratelimitcleanupname) periodically. This will remove rate limits that have not been used for a while.
-
 # Documentation
 <details open>
 	<summary>Table of contents</summary>
